@@ -1,0 +1,97 @@
+@startuml
+!include <C4/C4_Container>
+!include <C4/C4_Context>
+!include <C4/C4_Component>
+
+skinparam linetype ortho
+
+title C4 Container Diagram - Система aiExpert
+
+Person(employee, "Сотрудник", "Инициатор запросов на архитектурные решения")
+Person(architect, "Архитектор", "Ответственный за подготовку ADR")
+Person(manager, "Менеджер", "Контролирует работу архитекторов")
+Person(admin, "Администратор", "Управляет системой и справочниками")
+
+System_Ext(external_system, "Внешняя система (ACT-005)", "Инициирует запросы через API")
+System_Ext(mcp_source, "MCP-источник (ACT-006)", "Внешний провайдер данных/инструментов (LLM, Git, Jira...)")
+
+Container_Boundary(aiExpert, "aiExpert System") {
+    ' Веб-приложение
+    Container(web_app, "Веб-приложение aiExpert", "React, SPA", "Пользовательский интерфейс для всех ролей (сотрудник, архитектор, менеджер, администратор)")
+    
+    ' API Gateway
+    Container(api_gateway, "API Gateway", "Kong/Nginx", "Единая точка входа для внешних систем и веб-приложения. Маршрутизация, аутентификация, rate limiting.")
+    
+    ' Основные микросервисы/контейнеры
+    Container_Boundary(srv_layer, "Слой логики") {
+        Container(adr_svc, "Сервис управления ADR", "Python/Java, REST API", "Управляет жизненным циклом ADR (UC-004). Хранит версии ADR, контекст, результаты голосований.")
+        Container(request_svc, "Сервис управления запросами", "Python/Java, REST API", "Управляет ADR Request (UC-001). Хранит черновики, связывает с ABB/ADR, управляет статусами.")
+        Container(abb_svc, "Сервис архитектурных строительных блоков", "Python/Java, REST API", "Управляет справочником ABB, их связями с ADR и запросами. Используется для аналитики и предложений (UC-001, UC-002).")
+        Container(agent_orchestrator, "Оркестратор ИИ-агентов", "Python/Java", "Управляет агентами. Получает задачи от сервисов, запускает, останавливает и мониторит работу агента ADR-Worker.")
+        Container(reporting_svc, "Сервис отчетности", "Python/Java, REST API", "Формирует отчеты по запросам и работе архитекторов (UC-006). Агрегирует данные из разных сервисов.")
+        Container(dictionary_svc, "Сервис справочников", "Python/Java, REST API", "Управляет системными мастер-справочниками (UC-007).")
+        Container(team_svc, "Сервис управления командой", "Python/Java, REST API", "Управляет профилями архитекторов, их компетенциями и ролями (UC-008).")
+    }
+    ' Отдельный контейнер для агента
+    Container(adr_worker_agent, "ИИ-агент ADR-Worker", "Python, LLM, MCP-клиент", "Оркестрирует процесс подготовки и согласования ADR (UC-004, UC-005). Планирует шаги, вызывает MCP-инструменты, взаимодействует с сервисами.")
+    
+    ' Хранилища данных (отдельные контейнеры БД для каждого микросервиса)
+    Container_Boundary(db_layer, "Слой данных") {
+        ContainerDb(request_db, "База данных запросов", "PostgreSQL", "Хранит данные ADR Request.")
+        ContainerDb(adr_db, "База данных ADR", "PostgreSQL", "Хранит данные ADR.")
+        ContainerDb(abb_db, "База данных ABB", "PostgreSQL/Neo4j", "Хранит ABB и их связи.")
+        ContainerDb(dictionary_db, "База данных справочников", "PostgreSQL", "Хранит системные справочники.")
+        ContainerDb(team_db, "База данных команды", "PostgreSQL", "Хранит профили архитекторов.")
+        ContainerDb(reporting_db, "Хранилище отчетных данных", "ClickHouse/Redshift", "Оптимизировано для аналитических запросов.")
+        ContainerDb(agent_db, "База данных агента", "PostgreSQL", "Хранит состояние, контекст и журнал работы агента ADR-Worker.")
+    }
+}
+
+' Взаимосвязи между контейнерами внутри системы
+Rel(web_app, api_gateway, "Использует", "HTTPS")
+Rel(api_gateway, request_svc, "Маршрутизирует запросы", "REST/HTTPS")
+Rel(api_gateway, adr_svc, "Маршрутизирует запросы", "REST/HTTPS")
+Rel(api_gateway, abb_svc, "Маршрутизирует запросы", "REST/HTTPS")
+Rel(api_gateway, reporting_svc, "Маршрутизирует запросы", "REST/HTTPS")
+Rel(api_gateway, dictionary_svc, "Маршрутизирует запросы", "REST/HTTPS")
+Rel(api_gateway, team_svc, "Маршрутизирует запросы", "REST/HTTPS")
+Rel(api_gateway, agent_orchestrator, "Отправляет команды агенту", "REST/HTTPS")
+
+' Связи между сервисами
+Rel(request_svc, abb_svc, "Ищет связанные ABB/ADR (UC-001)", "REST/HTTPS")
+Rel(request_svc, team_svc, "Определяет архитектора (UC-001)", "REST/HTTPS")
+Rel_R(request_svc, agent_orchestrator, "Запускает агента для нового запроса (UC-001)", "REST/HTTPS/RabbitMQ")
+Rel(adr_svc, agent_orchestrator, "Запускает агента для подготовки ADR (UC-004)", "REST/HTTPS/RabbitMQ")
+Rel_L(agent_orchestrator, adr_worker_agent, "Управляет жизненным циклом агента", "REST/HTTPS")
+Rel(adr_worker_agent, request_svc, "Обновляет статус/данные запроса", "REST/HTTPS")
+Rel(adr_worker_agent, adr_svc, "Обновляет ADR, получает шаблоны", "REST/HTTPS")
+Rel(adr_worker_agent, team_svc, "Получает информацию об архитекторах", "REST/HTTPS")
+Rel(adr_worker_agent, abb_svc, "Получает информацию об ABB", "REST/HTTPS")
+Rel(adr_worker_agent, dictionary_svc, "Получает статусы, шаблоны и правила", "REST/HTTPS")
+Rel(reporting_svc, request_svc, "Собирает данные", "REST/HTTPS")
+Rel(reporting_svc, adr_svc, "Собирает данные", "REST/HTTPS")
+Rel(reporting_svc, team_svc, "Собирает данные", "REST/HTTPS")
+
+' Связи между сервисами и их БД
+Rel(request_svc, request_db, "Читает/пишет", "SQL/JDBC")
+Rel(adr_svc, adr_db, "Читает/пишет", "SQL/JDBC")
+Rel(abb_svc, abb_db, "Читает/пишет", "SQL/JDBC")
+Rel(dictionary_svc, dictionary_db, "Читает/пишет", "SQL/JDBC")
+Rel(team_svc, team_db, "Читает/пишет", "SQL/JDBC")
+Rel(reporting_svc, reporting_db, "Читает", "SQL/Native")
+Rel(adr_worker_agent, agent_db, "Читает/пишет", "SQL/JDBC")
+
+
+
+
+' Связи с внешними системами и агентом
+Rel(external_system, api_gateway, "Отправляет запросы (UC-001, UC-002, UC-003)", "HTTPS/REST")
+Rel(adr_worker_agent, mcp_source, "Использует MCP-инструменты (UC-005)", "MCP-протокол/HTTPS")
+
+' Связи с людьми
+Rel(employee, web_app, "Создает запросы (UC-001, UC-002, UC-003)", "HTTPS")
+Rel(architect, web_app, "Работает с ADR (UC-004)", "HTTPS")
+Rel(manager, web_app, "Смотрит отчеты (UC-006)", "HTTPS")
+Rel(admin, web_app, "Управляет справочниками и командой (UC-007, UC-008)", "HTTPS")
+
+@enduml

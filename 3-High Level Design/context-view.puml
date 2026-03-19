@@ -1,0 +1,39 @@
+@startuml
+!NEW_C4_STYLE=1
+' C4 System Landscape (context) for aiExpert
+' Uses C4-PlantUML standard library (remote include).
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title aiExpert — C4 System Landscape
+
+Person(user, "Сотрудник", "Запрашивает текущую архитектуру. Инициирует запросы на ADR")
+Person(architect, "Архитектор", "Готовит и согласует ADR; работает с ABB и запросами")
+Person(admin, "Администратор", "Управляет профилями пользователей и справочниками")
+Person(manager, "Менеджер", "Оценивает загрузку и качество работы архитекторов")
+
+Boundary(sud, "Границы решения") {
+  System(aiexpert, "aiExpert", "Платформа цифровых архитекторов")
+  System(archrepo, "Architecture Repository", "SYS-003 Управление ЖЦ основных архитектурных элементов")
+  System(llm, "LLM Service", "Локальная установка или сервис обращения к внешней LLM")  
+}    
+
+System_Ext(cmdb, "CMDB", "SYS-001 База данных конфигураций")
+System_Ext(wiki, "Confluence", "SYS-002 Корпоративная база знаний")
+System_Ext(notify, "Уведомления", "SYS-004 Email/Chat")
+System_Ext(idp, "IdP/SSO", "SYS-005 Корпоративная аутентификация")
+
+Rel(user, aiexpert, "Создаёт ADR Request и запросы, просматривает результаты", "UI")
+Rel(architect, aiexpert, "Готовит/согласует ADR, работает с ABB и запросами", "UI")
+Rel(admin, aiexpert, "Настраивает справочники и права", "UI")
+Rel(manager, aiexpert, "Получает отчёты и метрики", "UI")
+
+Rel(aiexpert, idp, "Аутентификация пользователей и сервисных аккаунтов", "OIDC/SAML")
+Rel(archrepo, idp, "Аутентификация пользователей", "OIDC/SAML")
+Rel(aiexpert, cmdb, "Обогащение запросов/ADR конфигурационными данными", "REST/JDBC")
+Rel(aiexpert, wiki, "Чтение архитектурных документов и артефактов", "MCP/HTTP")
+Rel_L(aiexpert, llm, "Взаимодействие с моделью")
+Rel_R(aiexpert, archrepo, "Чтение/синхронизация ADR и ABB", "MCP/API")
+Rel(aiexpert, notify, "Уведомления/эскалации по событиям процесса", "SMTP/API")
+
+@enduml
+
