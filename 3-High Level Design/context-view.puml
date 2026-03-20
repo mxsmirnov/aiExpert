@@ -4,10 +4,11 @@
 ' Uses C4-PlantUML standard library (remote include).
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
+
 title aiExpert — C4 System Landscape
 
 Person(user, "Сотрудник", "Запрашивает текущую архитектуру. Инициирует запросы на ADR")
-Person(architect, "Архитектор", "Готовит и согласует ADR; работает с ABB и запросами")
+Person(architect, "Архитектор", "Готовит и согласует ADR; работает с ABB и запросами на ADR")
 Person(admin, "Администратор", "Управляет профилями пользователей и справочниками")
 Person(manager, "Менеджер", "Оценивает загрузку и качество работы архитекторов")
 

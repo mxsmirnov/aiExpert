@@ -1,6 +1,6 @@
 # ADR-0003: Оркестрация агента ADR-Worker на LangGraph
 
-**Статус:** Черновик  
+**Статус:** В работе  
 **Дата:** 2026-03-20  
 **Автор:** [Имя, роль/ID ACT-xxx]  
 **Связанные артефакты:** UC-005, ACT-006; [uc-realization.md](../3-High%20Level%20Design/uc-realization.md); ADR-0001, ADR-0002  

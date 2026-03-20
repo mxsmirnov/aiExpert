@@ -8,6 +8,6 @@
 
 Диаграмма находится в файле `context-view.puml` и является каноничным System Landscape представлением контекста решения.
 
-![C4 System Landscape — aiExpert](context-view.png)
+![C4 System Landscape — aiExpert](..\images\context-view.png)
 
 
