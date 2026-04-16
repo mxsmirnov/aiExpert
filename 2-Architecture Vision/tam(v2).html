@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TAM 2.0 | Узкие группы · Акцентные приложения · Иконки</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* КИБЕРПАНК-ФОН */
+    body {
+      background: radial-gradient(ellipse at 30% 20%, #0a0f1a, #010308);
+      font-family: 'Inter', 'Segoe UI', 'Fira Code', monospace, system-ui;
+      padding: 2rem 2rem;
+      color: #e0f2fe;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* динамическая сетка */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0, 255, 255, 0.02) 0px, rgba(0, 255, 255, 0.02) 1px, transparent 1px, transparent 6px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .capabilities-wrapper {
+      max-width: 1900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ЗАГОЛОВОК */
+    .page-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 2px solid #0ff6;
+      padding-bottom: 0.75rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .page-title {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #0ff, #a0f, #f0f, #ffaa00);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .title-glow {
+      font-size: 0.7rem;
+      background: #0ff2a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      margin-left: 1rem;
+      font-weight: 500;
+      color: #000;
+      border: 1px solid #0ff;
+    }
+
+    .page-sub {
+      color: #8db5d4;
+      margin-top: 0.7rem;
+      font-size: 0.85rem;
+      max-width: 850px;
+      border-left: 3px solid #0ff;
+      padding-left: 1rem;
+      background: #00000040;
+    }
+
+    /* VERTICAL FLEX WRAP — группы УЖЕ (ширина 280px) */
+    .flex-categories {
+      display: flex;
+      flex-flow: column wrap;
+      align-content: flex-start;
+      gap: 1.2rem;
+      height: 1600px;
+      transition: height 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    /* ГРУППЫ — фиксированная ширина 280px, цветовая вариативность */
+    .capability-group {
+      flex: 0 0 auto;
+      width: 280px;
+      max-width: 100%;
+      backdrop-filter: blur(14px);
+      border-radius: 1.6rem;
+      transition: all 0.25s ease;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      background: rgba(8, 18, 28, 0.85);
+      box-shadow: 0 15px 25px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* вариации цветов групп (разные оттенки сине-фиолетово-зеленого) */
+    .capability-group[data-theme="0"] { background: rgba(10, 25, 40, 0.88); border-left: 3px solid #0ff; }
+    .capability-group[data-theme="1"] { background: rgba(18, 20, 45, 0.85); border-left: 3px solid #f0f; }
+    .capability-group[data-theme="2"] { background: rgba(8, 30, 35, 0.88); border-left: 3px solid #ffaa44; }
+    .capability-group[data-theme="3"] { background: rgba(30, 12, 45, 0.85); border-left: 3px solid #a0f; }
+    .capability-group[data-theme="4"] { background: rgba(0, 35, 45, 0.9); border-left: 3px solid #0fa; }
+    .capability-group[data-theme="5"] { background: rgba(22, 18, 38, 0.88); border-left: 3px solid #ff55cc; }
+
+    .capability-group:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 30px -8px black, 0 0 0 1px rgba(0, 255, 255, 0.6);
+    }
+
+    .group-content {
+      padding: 1rem 1rem 1.2rem 1rem;
+    }
+
+    /* ЗАГОЛОВОК КЛИКАБЕЛЬНЫЙ */
+    .category-head {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 0.9rem;
+      color: #0ff;
+      background: linear-gradient(90deg, #0ff1a, transparent);
+      padding: 0.4rem 0 0.4rem 0.6rem;
+      border-left: 4px solid #f0f;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.4rem;
+      user-select: none;
+      transition: 0.2s;
+      border-radius: 0 1rem 1rem 0;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .category-head:hover {
+      background: linear-gradient(90deg, #0ff2a, #0a1a2a);
+      text-shadow: 0 0 4px #0ff;
+    }
+
+    .title-text {
+      flex: 1;
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+
+    .category-sub {
+      font-size: 0.55rem;
+      font-weight: 400;
+      color: #9bc0d0;
+      display: block;
+      text-transform: none;
+    }
+
+    .toggle-icon {
+      font-size: 1rem;
+      background: #0a1422;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      color: #0ff;
+      border: 1px solid #0ff8;
+    }
+
+    /* анимированный контейнер списка */
+    .capabilities-list-container {
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    .capabilities-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      list-style: none;
+      margin-top: 0.2rem;
+    }
+
+    /* БАЗОВЫЙ ПРЯМОУГОЛЬНИК (терминал) */
+    .cap-item {
+      background: #07121cee;
+      border-radius: 0.9rem;
+      padding: 0.55rem 0.7rem 0.55rem 1.7rem;
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: #c4e6ff;
+      border: 1px solid #1c6c8c;
+      line-height: 1.35;
+      font-family: 'Fira Code', monospace;
+      position: relative;
+      transition: all 0.15s;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    .cap-item::before {
+      content: ">";
+      position: absolute;
+      left: 0.55rem;
+      color: #0ff;
+      font-weight: bold;
+      opacity: 0.8;
+      font-size: 0.7rem;
+    }
+
+    /* АКЦЕНТНЫЙ СТИЛЬ ДЛЯ 10 СЛУЧАЙНЫХ ПРИЛОЖЕНИЙ */
+    .cap-item.highlight-app {
+      background: linear-gradient(135deg, #2a2e5ecc, #1a2a4ecc);
+      border-left: 4px solid #ffaa44;
+      border-color: #ffaa66;
+      color: #fff7e0;
+      text-shadow: 0 0 2px #ffaa44;
+      box-shadow: 0 0 8px rgba(255, 170, 68, 0.3);
+    }
+
+    .cap-item.highlight-app::before {
+      color: #ffaa44;
+      content: "★";
+      font-size: 0.7rem;
+    }
+
+    /* стиль для иконок внутри (если есть эмодзи) */
+    .cap-item .app-icon {
+      margin-right: 6px;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+
+    .cap-item:hover {
+      background: #0e2a38ee;
+      border-color: #0ff;
+      transform: translateX(3px);
+    }
+
+    /* вложенные элементы */
+    .has-children {
+      background: #0c1c28dd;
+      border-left: 4px solid #f0f;
+      padding-left: calc(0.7rem - 4px);
+      flex-direction: column;
+    }
+
+    .parent-title {
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      color: #f0f;
+      font-size: 0.75rem;
+    }
+
+    .child-list {
+      list-style: none;
+      margin-top: 0.3rem;
+      padding-left: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .child-item {
+      background: #041016ee;
+      border-radius: 0.7rem;
+      padding: 0.4rem 0.6rem 0.4rem 1.3rem;
+      font-size: 0.7rem;
+      color: #bbdef5;
+      border: 1px solid #2c7488;
+      position: relative;
+    }
+
+    .child-item::before {
+      content: "└─";
+      position: absolute;
+      left: 0.4rem;
+      color: #0ff;
+    }
+
+    /* адаптив */
+    @media (max-width: 780px) {
+      body {
+        padding: 1rem;
+      }
+      .flex-categories {
+        height: auto !important;
+        flex-flow: row wrap;
+        justify-content: center;
+      }
+      .capability-group {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+
+    .footer-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.65rem;
+      color: #5f8aa8;
+      border-top: 1px solid #0ff3;
+      padding-top: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="capabilities-wrapper">
+  <div class="page-header">
+    <h1 class="page-title">📡 TAM 2.0 · УЗКИЕ ГРУППЫ <span class="title-glow">280px + акцентные приложения</span></h1>
+    <div class="page-sub">
+      ⚡ Группы уже — 280px, названия переносятся на 2-3 строки. <strong>10 случайных приложений</strong> подсвечены золотым акцентом. 
+      У некоторых приложений добавлены иконки (⚡📡🔒💎🤖 и др.). Цветовая гамма групп слегка варьируется.
+    </div>
+  </div>
+
+  <div class="flex-categories" id="tamNarrowContainer"></div>
+  <div class="footer-note">
+    🧩 TAM (TM Forum) — 10 доменов, 70+ приложений. Случайные акценты, иконки, узкие колонки. Клик по заголовку — скрыть/раскрыть.
+  </div>
+</div>
+
+<script>
+  // ------------------------------------------------------------------
+  // РАСШИРЕННАЯ TAM (10 доменов, 70+ приложений) + иконки
+  // ------------------------------------------------------------------
+  const tamDomainsNarrow = [
+    { title: "CUSTOMER MGMT", sub: "CRM / клиенты", items: ["Customer Information Management (MDM)", "Customer Analytics & Segmentation", "Lead & Opportunity Management", "Sales Order Management (CRM)", "Contact Center & Omnichannel", "Loyalty & Retention Engine", "Customer Self-care Portal", "Complaint & Feedback Management"] },
+    { title: "SERVICE MGMT", sub: "Service Ops", items: ["Service Catalog & Config", "Service Order Management", "Service Activation & Provisioning", "Service Testing & Validation", "SLA & QoE Management", "Service Inventory Mgmt", "Service Topology Discovery", "SLA Monitoring"] },
+    { title: "RESOURCE MGMT", sub: "Network / ресурсы", items: ["Network Inventory Mgmt", "Resource Provisioning", "Fault & Event Mgmt (FCAPS)", "Performance Analytics", "SDN/NFV Orchestration", "IP/Transport & RAN Mgmt", "Optical Access Mgmt", "Network Config Mgmt"] },
+    { title: "PARTNER MGMT", sub: "Партнеры", items: ["Partner Onboarding", "Supplier Performance Mgmt", "Partner API Gateway", "Interconnect & Roaming", "Wholesale Management", "Partner Contract Mgmt", "Revenue Sharing Auto"] },
+    { title: "FULFILLMENT", sub: "Order to Activate", items: ["Order Capture & Validation", "Workforce Field Mgmt", "Inventory Reservation", "Service Orchestration", "Activation Automation", "Order Tracking", "Cross-domain Order Broker", { isParent: true, parentText: "⚙️ Complex Order Mgmt", children: ["Multi-service Decomposition", "Dependency Resolution", "Fallback"] }] },
+    { title: "ASSURANCE", sub: "Quality & Faults", items: ["SLA Monitoring & Reporting", "Root Cause Analysis", "Auto Trouble Ticketing", "Incident Management", "Predictive Assurance AIOps", "Proactive Fault Mgmt", "Network Performance", { isParent: true, parentText: "⚠️ Customer Experience", children: ["Journey Analytics", "Proactive Notification", "Remediation Auto"] }] },
+    { title: "BILLING & REVENUE", sub: "Billing/Charging", items: ["Convergent Rating & Charging", "Mediation & CDR", "Invoice & Payment", "Revenue Sharing", "Collections & Dunning", "Price Plan Engine", "Roaming Billing", { isParent: true, parentText: "💰 Policy Control (PCC)", children: ["Dynamic Policy", "Spending Limits", "Quota Mgmt"] }] },
+    { title: "ENTERPRISE", sub: "Корпоративное", items: ["Strategic Planning", "Financial & Cost Mgmt", "HR & Workforce", "IT Cloud Infra (CMP)", "Procurement", "Legal & Contract Mgmt", "Facilities Ops"] },
+    { title: "DATA & ANALYTICS", sub: "Big Data / AI", items: ["Data Lake & Warehouse", "Big Data Analytics", "Real-time Streaming", "Business Intelligence", "Predictive ML Ops", "Customer 360°", "Network Telemetry", "Revenue Assurance"] },
+    { title: "SECURITY & COMPLIANCE", sub: "Кибербезопасность", items: ["IAM (Identity Mgmt)", "SIEM", "Threat Intelligence", "Data Privacy (GDPR)", "Compliance (SOX/PCI)", "SOAR", "Network Security (FW/IDS)", "Audit & Risk"] }
+  ];
+
+  // ----- СПИСОК ИКОНОК ДЛЯ РАЗНЫХ ПРИЛОЖЕНИЙ (случайное назначение) -----
+  const iconSet = ["⚡", "📡", "🔒", "💎", "🤖", "🎯", "🛡️", "📊", "⚙️", "🌐", "🧠", "💰", "📞", "🔧", "💿", "🚀", "🎛️", "🔔", "📦", "🧩"];
+
+  // Функция для получения случайной иконки (но стабильной для одного приложения)
+  const iconCache = new Map();
+  function getRandomIconForApp(appName) {
+    if (iconCache.has(appName)) return iconCache.get(appName);
+    const randomIcon = iconSet[Math.floor(Math.random() * iconSet.length)];
+    iconCache.set(appName, randomIcon);
+    return randomIcon;
+  }
+
+  // ----- ГЕНЕРАЦИЯ 10 СЛУЧАЙНЫХ ПРИЛОЖЕНИЙ (по всей карте) -----
+  // Соберём все текстовые названия приложений (плоский список, исключая родительские контейнеры)
+  let allAppStrings = [];
+  tamDomainsNarrow.forEach(domain => {
+    domain.items.forEach(item => {
+      if (typeof item === 'string') allAppStrings.push(item);
+      else if (item.isParent && item.children) {
+        allAppStrings.push(item.parentText);
+        item.children.forEach(ch => allAppStrings.push(ch));
+      }
+    });
+  });
+  // Перемешиваем и выбираем первые 10 уникальных
+  const shuffled = [...allAppStrings];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  const highlightSet = new Set(shuffled.slice(0, Math.min(10, shuffled.length)));
+
+  // Функция рендера строки приложения с иконкой и возможным highlight
+  function renderAppWithIcon(appText, isChild = false) {
+    const icon = getRandomIconForApp(appText);
+    const highlightClass = highlightSet.has(appText) ? "highlight-app" : "";
+    // для дочерних элементов чуть меньше отступ
+    if (isChild) {
+      return `<li class="child-item ${highlightClass}"><span class="app-icon">${icon}</span> ${appText}</li>`;
+    } else {
+      return `<li class="cap-item ${highlightClass}"><span class="app-icon">${icon}</span> ${appText}</li>`;
+    }
+  }
+
+  // Рендер элемента списка (с иконками)
+  function renderListItemWithIcons(item) {
+    if (typeof item === 'string') {
+      return renderAppWithIcon(item, false);
+    } else if (item.isParent) {
+      let childrenHtml = '';
+      if (item.children && item.children.length) {
+        childrenHtml = `<ul class="child-list">${item.children.map(child => renderAppWithIcon(child, true)).join('')}</ul>`;
+      }
+      const parentIcon = getRandomIconForApp(item.parentText);
+      const parentHighlight = highlightSet.has(item.parentText) ? "highlight-app" : "";
+      return `<li class="cap-item has-children ${parentHighlight}"><span class="parent-title"><span class="app-icon">${parentIcon}</span> ${item.parentText}</span>${childrenHtml}</li>`;
+    }
+    return '';
+  }
+
+  // ----- Функция пересчёта высоты контейнера (column wrap) -----
+  function recalcNarrowHeight(container) {
+    if (window.innerWidth <= 780) {
+      container.style.height = 'auto';
+      return;
+    }
+    const groups = Array.from(container.children);
+    if (!groups.length) return;
+    const groupWidth = groups[0]?.offsetWidth || 280;
+    const gap = parseFloat(getComputedStyle(container).gap) || 16;
+    const containerWidth = container.clientWidth;
+    let columns = Math.max(1, Math.floor((containerWidth + gap) / (groupWidth + gap)));
+    columns = Math.min(columns, 5);
+    const columnHeights = new Array(columns).fill(0);
+    groups.forEach((group, idx) => {
+      const colIdx = idx % columns;
+      columnHeights[colIdx] += group.offsetHeight + gap;
+    });
+    const neededHeight = Math.max(...columnHeights) + 40;
+    container.style.height = Math.max(neededHeight, 650) + 'px';
+  }
+
+  // ----- Создание группы с коллапсом и разными цветовыми темами -----
+  function buildNarrowGroup(groupData, themeIndex) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'capability-group';
+    groupDiv.setAttribute('data-theme', themeIndex % 6);
+    
+    const groupContent = document.createElement('div');
+    groupContent.className = 'group-content';
+    
+    const header = document.createElement('div');
+    header.className = 'category-head';
+    const titleSpan = document.createElement('div');
+    titleSpan.className = 'title-text';
+    titleSpan.innerHTML = `${groupData.title}<span class="category-sub">${groupData.sub || ''}</span>`;
+    const toggleSpan = document.createElement('span');
+    toggleSpan.className = 'toggle-icon';
+    toggleSpan.textContent = '−';
+    header.appendChild(titleSpan);
+    header.appendChild(toggleSpan);
+    
+    const listContainer = document.createElement('div');
+    listContainer.className = 'capabilities-list-container';
+    const listUl = document.createElement('ul');
+    listUl.className = 'capabilities-list';
+    groupData.items.forEach(item => {
+      listUl.insertAdjacentHTML('beforeend', renderListItemWithIcons(item));
+    });
+    listContainer.appendChild(listUl);
+    groupContent.appendChild(header);
+    groupContent.appendChild(listContainer);
+    groupDiv.appendChild(groupContent);
+    
+    let isExpanded = true;
+    let animating = false;
+    const mainContainer = document.getElementById('tamNarrowContainer');
+    
+    function toggleVisibility() {
+      if (animating) return;
+      animating = true;
+      isExpanded = !isExpanded;
+      if (isExpanded) {
+        listContainer.style.maxHeight = listContainer.scrollHeight + 'px';
+        listContainer.style.opacity = '1';
+        toggleSpan.textContent = '−';
+        const onOpen = () => {
+          listContainer.style.maxHeight = 'none';
+          listContainer.removeEventListener('transitionend', onOpen);
+          animating = false;
+          setTimeout(() => recalcNarrowHeight(mainContainer), 50);
+        };
+        listContainer.addEventListener('transitionend', onOpen);
+        setTimeout(() => {
+          if (animating) {
+            listContainer.style.maxHeight = 'none';
+            animating = false;
+            recalcNarrowHeight(mainContainer);
+          }
+        }, 330);
+      } else {
+        const currentH = listContainer.scrollHeight;
+        listContainer.style.maxHeight = currentH + 'px';
+        void listContainer.offsetHeight;
+        listContainer.style.maxHeight = '0px';
+        listContainer.style.opacity = '0';
+        toggleSpan.textContent = '+';
+        const onClose = () => {
+          animating = false;
+          recalcNarrowHeight(mainContainer);
+          listContainer.removeEventListener('transitionend', onClose);
+        };
+        listContainer.addEventListener('transitionend', onClose);
+        setTimeout(() => {
+          if (animating) {
+            animating = false;
+            recalcNarrowHeight(mainContainer);
+          }
+        }, 330);
+      }
+    }
+    
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleVisibility();
+    });
+    
+    // инициализация: открыт
+    setTimeout(() => {
+      listContainer.style.maxHeight = listContainer.scrollHeight + 'px';
+      listContainer.style.opacity = '1';
+      listContainer.style.overflow = 'hidden';
+      setTimeout(() => {
+        if (isExpanded) listContainer.style.maxHeight = 'none';
+      }, 150);
+    }, 10);
+    
+    return groupDiv;
+  }
+  
+  // Рендер всех групп с разными темами
+  const container = document.getElementById('tamNarrowContainer');
+  tamDomainsNarrow.forEach((domain, idx) => {
+    container.appendChild(buildNarrowGroup(domain, idx));
+  });
+  
+  function updateLayout() {
+    recalcNarrowHeight(container);
+  }
+  
+  window.addEventListener('resize', () => setTimeout(updateLayout, 100));
+  setTimeout(updateLayout, 180);
+  
+  const resizeObserver = new ResizeObserver(() => updateLayout());
+  resizeObserver.observe(container);
+  document.querySelectorAll('.capability-group').forEach(g => resizeObserver.observe(g));
+</script>
+</body>
+</html>

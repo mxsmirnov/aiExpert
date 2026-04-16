@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TAM Framework | Telecom Application Map — Cyberpunk Edition</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* КИБЕРПАНК / ТЕЛЕКОМ-СТИЛЬ */
+    body {
+      background: radial-gradient(circle at 20% 30%, #0a0f1a, #03060c);
+      font-family: 'Inter', 'Segoe UI', 'Fira Code', monospace, system-ui;
+      padding: 2rem 2rem;
+      color: #e0f2fe;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* динамическая сетка-эффект (глитч-декор) */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0, 255, 255, 0.02) 0px, rgba(0, 255, 255, 0.02) 2px, transparent 2px, transparent 8px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .capabilities-wrapper {
+      max-width: 1800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* хакерский заголовок */
+    .page-header {
+      margin-bottom: 2.5rem;
+      border-bottom: 2px solid #0ff4;
+      padding-bottom: 0.75rem;
+      backdrop-filter: blur(2px);
+    }
+
+    .page-title {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #0ff, #a0f, #f0f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+      text-shadow: 0 0 8px #0ff4;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .title-glow {
+      font-size: 0.8rem;
+      background: #0ff1a;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      margin-left: 1rem;
+      font-weight: 500;
+      color: #000;
+      backdrop-filter: blur(4px);
+      border: 1px solid #0ff;
+    }
+
+    .page-sub {
+      color: #8db5d4;
+      margin-top: 0.7rem;
+      font-size: 0.9rem;
+      max-width: 800px;
+      border-left: 3px solid #0ff;
+      padding-left: 1rem;
+      background: #00000030;
+      border-radius: 0 12px 12px 0;
+    }
+
+    /* VERTICAL FLEX WRAP — колонки, подтягивание снизу вверх */
+    .flex-categories {
+      display: flex;
+      flex-flow: column wrap;
+      align-content: flex-start;
+      gap: 1.5rem;
+      height: 1500px;
+      transition: height 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    /* НЕОНОВЫЕ КАРТОЧКИ ГРУПП */
+    .capability-group {
+      flex: 0 0 auto;
+      width: 340px;
+      max-width: 100%;
+      background: rgba(12, 20, 30, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 255, 0.2), 0 0 15px rgba(0, 255, 255, 0.1);
+      transition: all 0.25s ease;
+      border: 1px solid #0ff3;
+    }
+
+    .capability-group:hover {
+      background: rgba(15, 30, 45, 0.9);
+      box-shadow: 0 25px 40px -12px black, 0 0 0 2px #0ff, 0 0 20px #0ff6;
+      transform: translateY(-4px);
+    }
+
+    .group-content {
+      padding: 1.3rem 1.2rem 1.5rem 1.2rem;
+    }
+
+    /* КЛИКАБЕЛЬНЫЙ ЗАГОЛОВОК С НЕОНОМ */
+    .category-head {
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #0ff;
+      background: linear-gradient(90deg, #0ff1a, transparent);
+      padding: 0.5rem 0 0.5rem 0.8rem;
+      border-left: 5px solid #f0f;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      user-select: none;
+      transition: 0.2s;
+      border-radius: 0 1.2rem 1.2rem 0;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .category-head:hover {
+      background: linear-gradient(90deg, #0ff2a, #0a1a2a);
+      text-shadow: 0 0 4px #0ff;
+    }
+
+    .title-text {
+      flex: 1;
+    }
+
+    .category-sub {
+      font-size: 0.65rem;
+      font-weight: 400;
+      color: #9bc0d0;
+      display: block;
+      letter-spacing: 0;
+      text-transform: none;
+      font-family: system-ui;
+    }
+
+    .toggle-icon {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: #0a1422;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      transition: 0.2s;
+      color: #0ff;
+      border: 1px solid #0ff6;
+      box-shadow: 0 0 5px #0ff;
+    }
+
+    /* анимированный контейнер списка */
+    .capabilities-list-container {
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    .capabilities-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      list-style: none;
+      margin-top: 0.4rem;
+    }
+
+    /* ПРЯМОУГОЛЬНИКИ - СТИЛЬ "ТЕРМИНАЛ" */
+    .cap-item {
+      background: #07121cee;
+      border-radius: 1rem;
+      padding: 0.7rem 1rem 0.7rem 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.2s;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #c4e6ff;
+      border: 1px solid #1c6c8c;
+      line-height: 1.4;
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      backdrop-filter: blur(2px);
+      position: relative;
+    }
+
+    .cap-item::before {
+      content: ">";
+      position: absolute;
+      left: 0.6rem;
+      color: #0ff;
+      font-weight: bold;
+      opacity: 0.7;
+    }
+
+    .cap-item {
+      padding-left: 1.8rem;
+    }
+
+    .cap-item:hover {
+      background: #0e2a38ee;
+      border-color: #0ff;
+      transform: translateX(6px) scale(1.01);
+      box-shadow: 0 0 12px #0ff4;
+      color: #ffffff;
+    }
+
+    /* вложенные элементы (для сложных приложений, например Assurance) */
+    .has-children {
+      background: #0c1c28dd;
+      border-left: 4px solid #f0f;
+      padding-left: calc(1rem - 4px);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+
+    .parent-title {
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      display: inline-block;
+      color: #f0f;
+      text-shadow: 0 0 3px #f0f;
+    }
+
+    .child-list {
+      list-style: none;
+      margin-top: 0.4rem;
+      margin-bottom: 0.2rem;
+      padding-left: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    .child-item {
+      background: #041016ee;
+      border-radius: 0.85rem;
+      padding: 0.5rem 0.9rem 0.5rem 1.7rem;
+      font-size: 0.8rem;
+      font-weight: 450;
+      color: #bbdef5;
+      border: 1px solid #2c7488;
+      transition: 0.15s;
+      position: relative;
+    }
+
+    .child-item::before {
+      content: "└─";
+      position: absolute;
+      left: 0.5rem;
+      color: #0ff;
+    }
+
+    .child-item:hover {
+      background: #0f2e3e;
+      border-color: #0ff;
+      transform: translateX(4px);
+    }
+
+    /* адаптив: переключение в обычный поток на узких экранах */
+    @media (max-width: 780px) {
+      body {
+        padding: 1rem;
+      }
+      .flex-categories {
+        height: auto !important;
+        flex-flow: row wrap;
+        gap: 1.2rem;
+        justify-content: center;
+      }
+      .capability-group {
+        width: 100%;
+        max-width: 420px;
+      }
+    }
+
+    .footer-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #5f8aa8;
+      border-top: 1px solid #0ff3;
+      padding-top: 1.5rem;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+
+    /* БЛИКИ И ГЛИТЧ */
+    @keyframes subtleGlitch {
+      0% { text-shadow: 0 0 2px #0ff; }
+      100% { text-shadow: 0 0 6px #f0f; }
+    }
+  </style>
+</head>
+<body>
+<div class="capabilities-wrapper">
+  <div class="page-header">
+    <h1 class="page-title">📡 TAM · TELECOM APPLICATION MAP <span class="title-glow">TM Forum Frameworx</span></h1>
+    <div class="page-sub">
+      ⚡ Карта приложений телеком-оператора (OSS/BSS) по стандарту TAM. Вертикальный flex-wrap — при сворачивании блоки подтягиваются снизу вверх. 
+      Каждый элемент — неон-прямоугольник. Нажми на заголовок, чтобы скрыть/раскрыть группу.
+    </div>
+  </div>
+
+  <div class="flex-categories" id="tamContainer"></div>
+
+  <div class="footer-note">
+    🌀 Telecom Application Map (TAM) — эталонная архитектура приложений для CSP | Группы: Customer, Service, Resource, Partner, Enterprise, Fulfillment, Assurance, Billing
+  </div>
+</div>
+
+<script>
+  // --------------------------------------------------------------
+  // TAM (Telecom Application Map) — ключевые домены и приложения
+  // Источник: TM Forum Frameworx, eTOM и SID. Отражает реальную карту приложений
+  // --------------------------------------------------------------
+  const tamDomains = [
+    {
+      title: "CUSTOMER MANAGEMENT",
+      sub: "Управление взаимоотношениями / CRM",
+      items: [
+        "Customer Analytics & Segmentation",
+        "Lead & Opportunity Management",
+        "Sales Order Management (CRM)",
+        "Contact Center & Omnichannel Desktop",
+        "Loyalty & Retention Engine",
+        "Customer Self-care Portal"
+      ]
+    },
+    {
+      title: "SERVICE MANAGEMENT & OPERATIONS",
+      sub: "Управление сервисами / Service Ops",
+      items: [
+        "Service Catalog & Configuration",
+        "Service Order Management",
+        "Service Activation & Provisioning",
+        "Service Testing & Validation",
+        "SLA & QoE Management",
+        "Service Inventory & Topology"
+      ]
+    },
+    {
+      title: "RESOURCE MANAGEMENT",
+      sub: "Управление сетевыми ресурсами",
+      items: [
+        "Network Inventory Management",
+        "Resource Provisioning & Discovery",
+        "Fault & Event Management (FCAPS)",
+        "Performance Management & Analytics",
+        "SDN/NFV Orchestration (NFVO)",
+        "IP/Transport & RAN Management"
+      ]
+    },
+    {
+      title: "SUPPLIER / PARTNER MANAGEMENT",
+      sub: "Взаимодействие с партнерами",
+      items: [
+        "Partner Onboarding & Lifecycle",
+        "Supplier Performance Management",
+        "Partner API Gateway & Marketplace",
+        "Interconnect & Roaming Settlement",
+        "Wholesale & Reseller Management"
+      ]
+    },
+    {
+      title: "FULFILLMENT (ORDER TO ACTIVATE)",
+      sub: "Сквозная реализация заказов",
+      items: [
+        "Order Capture & Validation",
+        "Workforce & Field Service Management",
+        "Inventory Reservation & Allocation",
+        "Service & Resource Orchestration",
+        "Activation & Testing Automation",
+        "Order Tracking & Notifications"
+      ]
+    },
+    {
+      title: "ASSURANCE (QUALITY & FAULTS)",
+      sub: "Обеспечение качества / мониторинг",
+      items: [
+        "SLA Monitoring & Reporting",
+        "Root Cause Analysis & Diagnostics",
+        "Automatic Trouble Ticketing",
+        "Service Desk & Incident Management",
+        "Predictive Assurance (AIOps)",
+        { isParent: true, parentText: "⚠️ Customer Experience Assurance", children: ["Customer Journey Analytics", "Proactive Notification", "Remediation Automation"] }
+      ]
+    },
+    {
+      title: "BILLING & REVENUE MANAGEMENT",
+      sub: "Биллинг, тарификация, доходы",
+      items: [
+        "Convergent Rating & Charging",
+        "Mediation & CDR Processing",
+        "Invoice & Payment Management",
+        "Revenue Sharing & Settlement",
+        "Collections & Dunning",
+        "Price Plan & Discount Engine"
+      ]
+    },
+    {
+      title: "ENTERPRISE MANAGEMENT",
+      sub: "Корпоративное управление (BSS/OSS cross)",
+      items: [
+        "Strategic Planning & Portfolio",
+        "Financial & Cost Management",
+        "HR & Workforce Administration",
+        "IT & Cloud Infrastructure (CMP)",
+        "Security & Compliance (GRC)",
+        "Data Governance & BI Platform"
+      ]
+    }
+  ];
+
+  // Рендер элемента списка (с поддержкой вложенных)
+  function renderListItem(item) {
+    if (typeof item === 'string') {
+      return `<li class="cap-item">${item}</li>`;
+    } else if (item.isParent) {
+      let childrenHtml = '';
+      if (item.children && item.children.length) {
+        childrenHtml = `<ul class="child-list">${item.children.map(child => `<li class="child-item">${child}</li>`).join('')}</ul>`;
+      }
+      return `<li class="cap-item has-children"><span class="parent-title">${item.parentText}</span>${childrenHtml}</li>`;
+    }
+    return '';
+  }
+
+  // Функция пересчёта высоты контейнера для column wrap (чтобы группы подтягивались снизу)
+  function recalcTamContainerHeight(container) {
+    if (window.innerWidth <= 780) {
+      container.style.height = 'auto';
+      return;
+    }
+    const groups = Array.from(container.children);
+    if (groups.length === 0) return;
+    const groupWidth = groups[0]?.offsetWidth || 340;
+    const gap = parseFloat(getComputedStyle(container).gap) || 24;
+    const containerWidth = container.clientWidth;
+    let columns = Math.max(1, Math.floor((containerWidth + gap) / (groupWidth + gap)));
+    columns = Math.min(columns, 4);
+    
+    const columnHeights = new Array(columns).fill(0);
+    groups.forEach((group, idx) => {
+      const colIdx = idx % columns;
+      const groupHeight = group.offsetHeight;
+      columnHeights[colIdx] += groupHeight + gap;
+    });
+    const neededHeight = Math.max(...columnHeights) + 30;
+    container.style.height = Math.max(neededHeight, 620) + 'px';
+  }
+
+  // Создание группы с collapsible и анимацией
+  function buildTamGroup(groupData) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'capability-group';
+    
+    const groupContent = document.createElement('div');
+    groupContent.className = 'group-content';
+    
+    const header = document.createElement('div');
+    header.className = 'category-head';
+    
+    const titleSpan = document.createElement('div');
+    titleSpan.className = 'title-text';
+    titleSpan.innerHTML = `${groupData.title}<span class="category-sub">${groupData.sub || ''}</span>`;
+    
+    const toggleSpan = document.createElement('span');
+    toggleSpan.className = 'toggle-icon';
+    toggleSpan.textContent = '−';  // развернут
+    header.appendChild(titleSpan);
+    header.appendChild(toggleSpan);
+    
+    const listContainer = document.createElement('div');
+    listContainer.className = 'capabilities-list-container';
+    
+    const listUl = document.createElement('ul');
+    listUl.className = 'capabilities-list';
+    groupData.items.forEach(item => {
+      listUl.insertAdjacentHTML('beforeend', renderListItem(item));
+    });
+    listContainer.appendChild(listUl);
+    groupContent.appendChild(header);
+    groupContent.appendChild(listContainer);
+    groupDiv.appendChild(groupContent);
+    
+    let isExpanded = true;
+    let animating = false;
+    const mainFlexContainer = document.getElementById('tamContainer');
+    
+    function toggleVisibility() {
+      if (animating) return;
+      animating = true;
+      isExpanded = !isExpanded;
+      
+      if (isExpanded) {
+        listContainer.style.maxHeight = listContainer.scrollHeight + 'px';
+        listContainer.style.opacity = '1';
+        toggleSpan.textContent = '−';
+        const onOpen = () => {
+          listContainer.style.maxHeight = 'none';
+          listContainer.removeEventListener('transitionend', onOpen);
+          animating = false;
+          setTimeout(() => recalcTamContainerHeight(mainFlexContainer), 60);
+        };
+        listContainer.addEventListener('transitionend', onOpen);
+        setTimeout(() => {
+          if (animating) {
+            listContainer.style.maxHeight = 'none';
+            animating = false;
+            recalcTamContainerHeight(mainFlexContainer);
+          }
+        }, 360);
+      } else {
+        const currentH = listContainer.scrollHeight;
+        listContainer.style.maxHeight = currentH + 'px';
+        void listContainer.offsetHeight;
+        listContainer.style.maxHeight = '0px';
+        listContainer.style.opacity = '0';
+        toggleSpan.textContent = '+';
+        const onClose = () => {
+          animating = false;
+          recalcTamContainerHeight(mainFlexContainer);
+          listContainer.removeEventListener('transitionend', onClose);
+        };
+        listContainer.addEventListener('transitionend', onClose);
+        setTimeout(() => {
+          if (animating) {
+            animating = false;
+            recalcTamContainerHeight(mainFlexContainer);
+          }
+        }, 350);
+      }
+    }
+    
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleVisibility();
+    });
+    
+    // инициализация: открыт
+    setTimeout(() => {
+      listContainer.style.maxHeight = listContainer.scrollHeight + 'px';
+      listContainer.style.opacity = '1';
+      listContainer.style.overflow = 'hidden';
+      setTimeout(() => {
+        if (isExpanded) listContainer.style.maxHeight = 'none';
+      }, 150);
+    }, 10);
+    
+    return groupDiv;
+  }
+  
+  // Рендер всех групп
+  const container = document.getElementById('tamContainer');
+  tamDomains.forEach(domain => {
+    container.appendChild(buildTamGroup(domain));
+  });
+  
+  // Инициализация адаптивной высоты
+  function updateLayout() {
+    recalcTamContainerHeight(container);
+  }
+  
+  window.addEventListener('resize', () => {
+    setTimeout(updateLayout, 120);
+  });
+  
+  setTimeout(updateLayout, 160);
+  
+  // ResizeObserver для отслеживания изменения высоты групп
+  const resizeObserver = new ResizeObserver(() => {
+    updateLayout();
+  });
+  resizeObserver.observe(container);
+  document.querySelectorAll('.capability-group').forEach(g => resizeObserver.observe(g));
+</script>
+</body>
+</html>

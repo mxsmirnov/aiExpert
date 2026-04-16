@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Business Capabilities | Карточки-прямоугольники + гибкие группы</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4f7fc 0%, #e2e9f0 100%);
+      font-family: 'Inter', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 2rem 2rem;
+      color: #132e3c;
+    }
+
+    /* главный контейнер */
+    .capabilities-wrapper {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* заголовок */
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: -0.3px;
+      background: linear-gradient(130deg, #155f7c, #2c9bb3);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+      border-left: 6px solid #2c9bb3;
+      padding-left: 1rem;
+    }
+
+    /* FLEX-контейнер для категорий - теперь группы будут занимать место по содержимому (flex-basis: auto) 
+       но с возможностью переноса и отступами */
+    .flex-categories {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 1.8rem;
+      align-items: flex-start;   /* важно: группы не растягиваются по высоте принудительно, размер зависит от контента */
+      justify-content: flex-start;
+    }
+
+    /* каждая группа (категория) — ширина зависит от текста, но с ограничением минимальной ширины для читаемости */
+    .capability-group {
+      flex: 0 1 auto;           /* не растягивается, сужается по содержимому */
+      min-width: 280px;         /* минимальная ширина для комфорта */
+      max-width: 420px;         /* ограничиваем, чтобы слишком широкие группы не разрывали сетку */
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(0px);
+      border-radius: 2rem;
+      box-shadow: 0 16px 28px -12px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+      border: 1px solid #ffffff88;
+    }
+
+    .capability-group:hover {
+      background: #ffffff;
+      box-shadow: 0 24px 36px -14px rgba(0, 32, 64, 0.2);
+      border-color: #cde3ed;
+      transform: translateY(-3px);
+    }
+
+    /* внутренний отступ группы */
+    .group-content {
+      padding: 1.5rem 1.5rem 1.8rem 1.5rem;
+    }
+
+    /* заголовок категории */
+    .category-head {
+      font-weight: 700;
+      font-size: 1.35rem;
+      margin-bottom: 1.2rem;
+      color: #115267;
+      background: linear-gradient(90deg, #e6f0f5, transparent);
+      padding: 0.25rem 0 0.25rem 0.6rem;
+      border-left: 4px solid #2a9d8f;
+      letter-spacing: -0.2px;
+    }
+
+    .category-sub {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #4f7e96;
+      display: block;
+      margin-top: 0.2rem;
+    }
+
+    /* контейнер для списка (коллекция прямоугольников) */
+    .capabilities-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      list-style: none;
+    }
+
+    /* КАЖДЫЙ ЭЛЕМЕНТ СПИСКА — ПРЯМОУГОЛЬНИК (карточка внутри группы) */
+    .cap-item {
+      background: #ffffff;
+      border-radius: 1rem;
+      padding: 0.7rem 1rem 0.7rem 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #1a485f;
+      border: 1px solid #e2edf3;
+      display: flex;
+      align-items: baseline;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    /* легкий эффект при наведении на прямоугольник */
+    .cap-item:hover {
+      background: #f9fdfe;
+      border-color: #bddbe8;
+      box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.08);
+      transform: translateX(3px);
+    }
+
+    /* специальный стиль для родительского элемента, который содержит вложенные пункты (Урегулирование убытков) 
+       чтобы визуально выделить иерархию */
+    .has-children {
+      background: #f6fafd;
+      border-left: 4px solid #2c9bb3;
+      padding-left: calc(1rem - 4px);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+
+    /* контейнер для вложенных дочерних прямоугольников (третий уровень) */
+    .child-list {
+      list-style: none;
+      margin-top: 0.3rem;
+      margin-bottom: 0.2rem;
+      padding-left: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+    }
+
+    /* дочерние элементы списка (тоже прямоугольники) */
+    .child-item {
+      background: #ffffffea;
+      border-radius: 0.8rem;
+      padding: 0.5rem 0.9rem 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 450;
+      color: #2a5a6e;
+      border: 1px solid #d7e5ed;
+      transition: all 0.15s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      display: flex;
+      align-items: baseline;
+    }
+
+    .child-item:hover {
+      background: #ffffff;
+      border-color: #9fc7d9;
+      transform: translateX(4px);
+    }
+
+    /* отступ между текстом в родительском прямоугольнике (для "Урегулирование убытков") */
+    .parent-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      display: inline-block;
+    }
+
+    /* обычные прямоугольники без вложенности имеют стандартный вид */
+    /* маркеры больше не нужны, так как визуально всё оформлено карточками */
+
+    /* для лучшей адаптации групп на узких экранах */
+    @media (max-width: 780px) {
+      body {
+        padding: 1.2rem;
+      }
+      .flex-categories {
+        gap: 1.2rem;
+        justify-content: center;
+      }
+      .capability-group {
+        min-width: 260px;
+        max-width: 100%;
+        flex: 1 1 auto;
+      }
+    }
+
+    /* дополнительная стилизация подвала */
+    .footer-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #4c6f83;
+      border-top: 1px solid #cbdbe0;
+      padding-top: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.2px;
+    }
+
+    /* сохраняем четкую иерархию для элементов, которые без вложенности */
+    .plain-item {
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+<div class="capabilities-wrapper">
+  <h1 class="page-title">📦 Business Capabilities &nbsp;⎯&nbsp; иерархия блоками</h1>
+
+  <!-- FLEX-контейнер: каждая группа занимает ширину, пропорциональную содержимому (flex: 0 1 auto) -->
+  <div class="flex-categories">
+    
+    <!-- 1. Стратегические и управленческие -->
+    <div class="capability-group">
+      <div class="group-content">
+        <div class="category-head">
+          1. Стратегические и управленческие
+          <span class="category-sub">Strategic & Management</span>
+        </div>
+        <ul class="capabilities-list">
+          <li class="cap-item">Управление портфелем услуг (Service Portfolio Management)</li>
+          <li class="cap-item">Стратегическое планирование (Strategic Planning)</li>
+          <li class="cap-item">Финансовый менеджмент (Financial Management)</li>
+          <li class="cap-item">Управление рисками и комплаенс (Risk & Compliance Management)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2. Способности по работе с клиентами -->
+    <div class="capability-group">
+      <div class="group-content">
+        <div class="category-head">
+          2. Способности по работе с клиентами
+          <span class="category-sub">Customer-facing / Front-office</span>
+        </div>
+        <ul class="capabilities-list">
+          <li class="cap-item">Маркетинг и продажи (Marketing & Sales)</li>
+          <li class="cap-item">Оформление полисов (Policy Acquisition)</li>
+          <li class="cap-item">Расчет стоимости (Quotation)</li>
+          <li class="cap-item">Оформление заявки (Application Processing)</li>
+          <li class="cap-item">Обслуживание клиентов (Customer Service)</li>
+          <li class="cap-item">Управление взаимоотношениями (CRM)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3. Основные операционные способности (с вложенным списком => прямоугольники внутри) -->
+    <div class="capability-group">
+      <div class="group-content">
+        <div class="category-head">
+          3. Основные операционные способности
+          <span class="category-sub">Core Operations / Back-office</span>
+        </div>
+        <ul class="capabilities-list">
+          <li class="cap-item">Андеррайтинг (Underwriting) — оценка рисков</li>
+          <li class="cap-item">Администрирование полисов (Policy Administration)</li>
+          <li class="cap-item">Выпуск полисов (Policy Issuance)</li>
+          <li class="cap-item">Внесение изменений (Endorsements)</li>
+          <li class="cap-item">Продление (Renewals)</li>
+          
+          <!-- Пункт "Урегулирование убытков" с дочерними элементами - прямоугольники третьего уровня -->
+          <li class="cap-item has-children">
+            <span class="parent-title">📌 Урегулирование убытков (Claims Management)</span>
+            <ul class="child-list">
+              <li class="child-item">Прием заявлений (Claims Intake)</li>
+              <li class="child-item">Оценка ущерба (Claims Assessment)</li>
+              <li class="child-item">Выплата возмещений (Claims Settlement)</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 4. Поддерживающие способности -->
+    <div class="capability-group">
+      <div class="group-content">
+        <div class="category-head">
+          4. Поддерживающие способности
+          <span class="category-sub">Support Capabilities</span>
+        </div>
+        <ul class="capabilities-list">
+          <li class="cap-item">Управление ИТ-инфраструктурой (IT Infrastructure Management)</li>
+          <li class="cap-item">Управление персоналом (HR Management)</li>
+          <li class="cap-item">Юридическая поддержка (Legal Support)</li>
+          <li class="cap-item">Бухгалтерский учет (Accounting)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-note">
+    🧩 Каждый элемент бизнес-способности — отдельный прямоугольник | Размер группы определяется её содержимым (пропорционально тексту)
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Business Capabilities | Иерархический список</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #eef2f5 0%, #d9e0e8 100%);
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 2rem 1.5rem;
+      color: #1a2c3e;
+    }
+
+    /* главный контейнер */
+    .capabilities-wrapper {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* заголовок страницы */
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 4px solid #2c7da0;
+      display: inline-block;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #1f5068, #2c7da0);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.05);
+    }
+
+    /* FLEX-контейнер для категорий (главный flexbox) */
+    .flex-categories {
+      display: flex;
+      flex-flow: row wrap;
+      gap: 1.8rem;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    /* каждая карточка категории */
+    .capability-card {
+      flex: 1 1 320px;          /* резиновые карточки, минимальная ширина 320px */
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(0px);
+      border-radius: 32px;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0,0,0,0.05);
+      transition: all 0.25s ease-in-out;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .capability-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 28px 38px -16px rgba(0, 0, 0, 0.2);
+      background: #ffffff;
+      border-color: #cbdde6;
+    }
+
+    /* внутренний отступ карточки */
+    .card-content {
+      padding: 1.6rem 1.5rem 2rem 1.8rem;
+    }
+
+    /* заголовок категории */
+    .category-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      color: #1f5068;
+      border-left: 5px solid #2c7da0;
+      padding-left: 0.9rem;
+      line-height: 1.3;
+      letter-spacing: -0.2px;
+    }
+
+    /* стили для всех списков внутри карточки */
+    .capability-card ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* основные пункты (второй уровень) */
+    .capability-card > .card-content > ul > li {
+      margin-bottom: 0.7rem;
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: #1e2f3a;
+      position: relative;
+      padding-left: 1.6rem;
+      line-height: 1.4;
+    }
+
+    /* маркеры для элементов второго уровня */
+    .capability-card > .card-content > ul > li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: #2c7da0;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: transform 0.1s;
+    }
+
+    /* стили для вложенного списка (третий уровень) */
+    .sublist {
+      margin-top: 0.5rem;
+      margin-left: 1.2rem;
+      padding-left: 0.8rem;
+      border-left: 2px dashed #b9cfdf;
+      list-style: none;
+    }
+
+    .sublist li {
+      margin-bottom: 0.55rem;
+      padding-left: 1.4rem;
+      position: relative;
+      font-weight: 400;
+      color: #2c4758;
+      font-size: 0.92rem;
+    }
+
+    .sublist li::before {
+      content: "•";
+      position: absolute;
+      left: 0.2rem;
+      color: #5f9db2;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    /* пункт, который содержит вложенный список (Урегулирование убытков) */
+    .has-sublist {
+      margin-bottom: 0.5rem !important;
+      font-weight: 600 !important;
+      color: #0f3b4f !important;
+    }
+
+    /* небольшой отступ для последнего элемента, чтобы не слипалось */
+    .capability-card ul li:last-child,
+    .sublist li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* дополнительная стилизация для лучшей иерархии */
+    .capability-card li li {
+      font-weight: normal;
+    }
+
+    /* при необходимости — адаптив для совсем узких экранов */
+    @media (max-width: 720px) {
+      body {
+        padding: 1.2rem;
+      }
+      .flex-categories {
+        gap: 1.2rem;
+      }
+      .capability-card {
+        flex: 1 1 100%;
+      }
+      .category-title {
+        font-size: 1.3rem;
+      }
+      .card-content {
+        padding: 1.2rem;
+      }
+    }
+
+    /* мелкие улучшения для читаемости */
+    .card-content ul ul {
+      margin-top: 0.4rem;
+    }
+
+    /* акцент на английские названия (не меняя структуру) */
+    .capability-card li {
+      word-break: break-word;
+    }
+
+    /* подпись (доп. декор) */
+    .footer-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #4d6a7e;
+      border-top: 1px solid #cbdbe0;
+      padding-top: 1.5rem;
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+<div class="capabilities-wrapper">
+  <h1 class="page-title">📊 Business Capabilities</h1>
+
+  <!-- FLEX-контейнер: основные категории выстроены с помощью flexbox (row wrap, stretch) -->
+  <div class="flex-categories">
+    
+    <!-- 1. Стратегические и управленческие способности -->
+    <div class="capability-card">
+      <div class="card-content">
+        <div class="category-title">1. Стратегические и управленческие способности<br><span style="font-size:0.85rem; font-weight:normal;">(Strategic & Management)</span></div>
+        <ul>
+          <li>Управление портфелем услуг (Service Portfolio Management)</li>
+          <li>Стратегическое планирование (Strategic Planning)</li>
+          <li>Финансовый менеджмент (Financial Management)</li>
+          <li>Управление рисками и комплаенс (Risk & Compliance Management)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2. Способности по работе с клиентами (Customer-facing / Front-office) -->
+    <div class="capability-card">
+      <div class="card-content">
+        <div class="category-title">2. Способности по работе с клиентами<br><span style="font-size:0.85rem; font-weight:normal;">(Customer-facing / Front-office)</span></div>
+        <ul>
+          <li>Маркетинг и продажи (Marketing & Sales)</li>
+          <li>Оформление полисов (Policy Acquisition)</li>
+          <li>Расчет стоимости (Quotation)</li>
+          <li>Оформление заявки (Application Processing)</li>
+          <li>Обслуживание клиентов (Customer Service)</li>
+          <li>Управление взаимоотношениями (CRM)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3. Основные операционные способности (Core Operations / Back-office) -->
+    <div class="capability-card">
+      <div class="card-content">
+        <div class="category-title">3. Основные операционные способности<br><span style="font-size:0.85rem; font-weight:normal;">(Core Operations / Back-office)</span></div>
+        <ul>
+          <li>Андеррайтинг (Underwriting) — оценка рисков</li>
+          <li>Администрирование полисов (Policy Administration)</li>
+          <li>Выпуск полисов (Policy Issuance)</li>
+          <li>Внесение изменений (Endorsements)</li>
+          <li>Продление (Renewals)</li>
+          <!-- пункт с вложенным списком (иерархия 3-го уровня) -->
+          <li class="has-sublist">Урегулирование убытков (Claims Management)
+            <ul class="sublist">
+              <li>Прием заявлений (Claims Intake)</li>
+              <li>Оценка ущерба (Claims Assessment)</li>
+              <li>Выплата возмещений (Claims Settlement)</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 4. Поддерживающие способности (Support Capabilities) -->
+    <div class="capability-card">
+      <div class="card-content">
+        <div class="category-title">4. Поддерживающие способности<br><span style="font-size:0.85rem; font-weight:normal;">(Support Capabilities)</span></div>
+        <ul>
+          <li>Управление ИТ-инфраструктурой (IT Infrastructure Management)</li>
+          <li>Управление персоналом (HR Management)</li>
+          <li>Юридическая поддержка (Legal Support)</li>
+          <li>Бухгалтерский учет (Accounting)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-note">
+    🧩 Иерархическая структура Business Capabilities | Flexbox для расположения категорий
+  </div>
+</div>
+</body>
+</html>

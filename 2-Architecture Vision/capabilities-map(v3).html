@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Insurance Capability Map | Vertical Flex Wrap (снизу вверх)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+      font-family: 'Inter', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 2rem 2rem;
+      color: #0a2b38;
+    }
+
+    .capabilities-wrapper {
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(130deg, #0f4c5f, #1e88a0);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      display: inline-block;
+      border-left: 6px solid #1e88a0;
+      padding-left: 1rem;
+    }
+
+    .page-sub {
+      color: #4a6f7e;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      max-width: 800px;
+    }
+
+    .badge {
+      background: #1e88a020;
+      border-radius: 40px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #1e6b7c;
+      display: inline-block;
+      margin-left: 1rem;
+    }
+
+    /* 
+      ГЛАВНОЕ ИЗМЕНЕНИЕ:
+      Контейнер использует column wrap + фиксированную высоту.
+      При скрытии контента группы её высота уменьшается, и колонки 
+      перераспределяются — группы справа "подтягиваются снизу вверх"
+    */
+    .flex-categories {
+      display: flex;
+      flex-flow: column wrap;
+      align-content: flex-start;
+      gap: 1.6rem;
+      /* Высота контейнера подбирается так, чтобы группы размещались в 3-4 колонки
+         в зависимости от ширины экрана. Используем clamp для адаптивности */
+      height: 1400px;        /* базовое значение, будет пересчитано через JS для идеального заполнения */
+      transition: height 0.2s ease;
+    }
+
+    /* каждая группа — фиксированная ширина, высота зависит от содержимого */
+    .capability-group {
+      flex: 0 0 auto;
+      width: 320px;
+      max-width: 100%;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 1.8rem;
+      box-shadow: 0 16px 28px -12px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0,0,0,0.02);
+      transition: all 0.2s ease;
+      border: 1px solid #ffffffaa;
+      backdrop-filter: blur(2px);
+    }
+
+    .capability-group:hover {
+      background: #ffffff;
+      box-shadow: 0 24px 36px -14px rgba(0, 48, 64, 0.2);
+      border-color: #cfe3ed;
+    }
+
+    .group-content {
+      padding: 1.5rem 1.4rem 1.5rem 1.4rem;
+    }
+
+    /* ЗАГОЛОВОК КАТЕГОРИИ — КЛИКАБЕЛЬНАЯ ОБЛАСТЬ */
+    .category-head {
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
+      color: #0f4c5f;
+      background: linear-gradient(90deg, #e3f0f5, transparent);
+      padding: 0.3rem 0 0.3rem 0.7rem;
+      border-left: 4px solid #2a9d8f;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      user-select: none;
+      transition: background 0.2s;
+      border-radius: 0 1rem 1rem 0;
+    }
+
+    .category-head:hover {
+      background: linear-gradient(90deg, #d4e9f1, #eef4f8);
+    }
+
+    .category-head .title-text {
+      flex: 1;
+    }
+
+    .toggle-icon {
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: #ffffffcc;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      transition: transform 0.2s;
+      color: #2a9d8f;
+    }
+
+    .category-sub {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #5f8a9c;
+      display: block;
+      margin-top: 0.2rem;
+    }
+
+    /* Анимированный контейнер списка */
+    .capabilities-list-container {
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .capabilities-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      list-style: none;
+      margin-top: 0.2rem;
+    }
+
+    /* Прямоугольники */
+    .cap-item {
+      background: #ffffff;
+      border-radius: 1rem;
+      padding: 0.7rem 1rem 0.7rem 1rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 0 0 1px #e9f0f4;
+      transition: all 0.2s;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #1a5a6e;
+      border: 1px solid #e2edf3;
+      line-height: 1.4;
+    }
+
+    .cap-item:hover {
+      background: #fbfefe;
+      border-color: #b9d6e4;
+      box-shadow: 0 4px 10px -6px rgba(0, 0, 0, 0.1);
+      transform: translateX(4px);
+    }
+
+    .has-children {
+      background: #f5fafd;
+      border-left: 4px solid #2a9d8f;
+      padding-left: calc(1rem - 4px);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+
+    .parent-title {
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      display: inline-block;
+      color: #0f5e6b;
+    }
+
+    .child-list {
+      list-style: none;
+      margin-top: 0.4rem;
+      margin-bottom: 0.2rem;
+      padding-left: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .child-item {
+      background: #ffffffea;
+      border-radius: 0.85rem;
+      padding: 0.5rem 0.85rem 0.5rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 450;
+      color: #2f6d82;
+      border: 1px solid #ddeaf1;
+      transition: all 0.15s;
+    }
+
+    .child-item:hover {
+      background: #ffffff;
+      border-color: #9fc7d9;
+      transform: translateX(4px);
+    }
+
+    /* Адаптив: при узком экране переходим на обычный column wrap с автоматической высотой */
+    @media (max-width: 780px) {
+      body {
+        padding: 1.2rem;
+      }
+      .flex-categories {
+        height: auto !important;
+        flex-flow: row wrap;
+        gap: 1rem;
+        justify-content: center;
+      }
+      .capability-group {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+
+    .footer-note {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #5c7f8e;
+      border-top: 1px solid #cbdbe0;
+      padding-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="capabilities-wrapper">
+  <div class="page-header">
+    <h1 class="page-title">🏢 Insurance Capability Map <span class="badge">Vertical Flex Wrap (снизу вверх)</span></h1>
+    <div class="page-sub">
+      📐 Группы расположены в колонках с помощью <code>flex-flow: column wrap</code> и фиксированной высоты контейнера.
+      <strong>При скрытии содержимого группы её высота уменьшается → соседние группы справа подтягиваются снизу вверх</strong>, занимая свободное место.
+      Нажмите на любой заголовок, чтобы увидеть эффект.
+    </div>
+  </div>
+
+  <div class="flex-categories" id="capabilitiesContainer"></div>
+
+  <div class="footer-note">
+    ⚡ Динамический расчёт высоты контейнера для оптимального заполнения. При сворачивании/разворачивании группы остальные перетекают вверх, заполняя пустоты.
+  </div>
+</div>
+
+<script>
+  // Данные категорий (расширенная версия, как в финальном варианте)
+  const categoriesData = [
+    {
+      title: "1. Product & Service Management",
+      sub: "Управление продуктами и услугами",
+      items: [
+        "Product Development & Innovation (разработка страховых продуктов)",
+        "Pricing & Rate Making (актуарные расчеты, тарификация)",
+        "Product Lifecycle Management (управление жизненным циклом продуктов)",
+        "Rider & Endorsement Configuration (настройка дополнительных опций)",
+        "Market Research & Competitive Analysis"
+      ]
+    },
+    {
+      title: "2. Marketing & Sales",
+      sub: "Маркетинг и продажи",
+      items: [
+        "Customer Acquisition & Lead Management",
+        "Omnichannel Distribution (агенты, брокеры, прямые продажи, партнеры)",
+        "Quotation & Illustration (расчет стоимости, котировки)",
+        "Application Processing (оформление заявок, new business intake)",
+        "Cross-sell & Upsell Campaigns",
+        "Loyalty & Retention Programs"
+      ]
+    },
+    {
+      title: "3. Underwriting & Risk Assessment",
+      sub: "Андеррайтинг и оценка рисков",
+      items: [
+        "Risk Evaluation & Selection (оценка и отбор рисков)",
+        "Automated Underwriting (Straight-Through Processing)",
+        "Predictive Modeling & Data Enrichment",
+        "Reinsurance Management (перестрахование)",
+        "Exposure & Catastrophe Risk Modeling",
+        "Mortality & Morbidity Analysis (для Life & Health)"
+      ]
+    },
+    {
+      title: "4. Policy Administration",
+      sub: "Администрирование полисов",
+      items: [
+        "Policy Issuance & Fulfillment (выпуск полисов)",
+        "Endorsements & Changes (внесение изменений, райдеры)",
+        "Renewals & Lapse Management (продление, удержание)",
+        "Policy Loans & Surrenders (ссуды, выкуп — для Life)",
+        "Beneficiary Management (управление бенефициарами)",
+        "Billing & Collections (биллинг, комиссионные, налоги)"
+      ]
+    },
+    {
+      title: "5. Claims Management",
+      sub: "Урегулирование убытков",
+      items: [
+        "First Notice of Loss (FNOL) — прием заявлений",
+        "Claims Triage & Routing",
+        "Claims Investigation & Assessment (оценка ущерба)",
+        "Fraud Detection & Analytics",
+        { isParent: true, parentText: "⚖️ Claims Settlement & Resolution", children: ["Payment Authorization & Disbursement (выплаты)", "Subrogation & Recovery (регресс)", "Claims Litigation Management"] },
+        "Customer Communication & Status Tracking"
+      ]
+    },
+    {
+      title: "6. Customer Service & CRM",
+      sub: "Обслуживание и управление взаимоотношениями",
+      items: [
+        "Multi-channel Support (call center, чат, email, соцсети)",
+        "Self-service Portal & Mobile App",
+        "Customer 360° View & Unified Profile",
+        "Complaint Resolution & Escalation",
+        "Loyalty & Retention Analytics",
+        "Voice of Customer (NPS, surveys)"
+      ]
+    },
+    {
+      title: "7. Risk & Compliance Management",
+      sub: "Риски, комплаенс и регулирование",
+      items: [
+        "Enterprise Risk Management (ERM)",
+        "Regulatory Reporting (Solvency II, Local GAAP)",
+        "AML / KYC Compliance (противодействие отмыванию)",
+        "Data Privacy & Protection (GDPR, CCPA)",
+        "Internal Audit & Controls",
+        "Model Governance & Validation"
+      ]
+    },
+    {
+      title: "8. Finance & Treasury",
+      sub: "Финансы, учет и инвестиции",
+      items: [
+        "Accounting & General Ledger",
+        "Investment Management (управление инвестиционным портфелем, float)",
+        "Reinsurance Accounting & Settlement",
+        "Statutory & Tax Reporting",
+        "Budgeting & Financial Planning",
+        "Actuarial Reserving (расчет резервов)"
+      ]
+    },
+    {
+      title: "9. Enterprise Services",
+      sub: "Поддерживающие сервисы",
+      items: [
+        "IT Infrastructure & Cloud Management",
+        "Data Management & Governance (Master Data, Analytics)",
+        "Human Resources (HRM, Talent, Payroll)",
+        "Legal Support & Contract Management",
+        "Procurement & Vendor Management",
+        "Facilities & Operations Management"
+      ]
+    },
+    {
+      title: "10. Strategy & Business Management",
+      sub: "Стратегия и корпоративное управление",
+      items: [
+        "Strategic & Enterprise Planning",
+        "Mergers & Acquisitions (M&A)",
+        "Partnership & Ecosystem Management",
+        "Business Performance Management (KPI, OKR)",
+        "Knowledge Management & Training",
+        "Corporate Communications & Brand"
+      ]
+    }
+  ];
+
+  // Рендер элемента списка
+  function renderListItem(item) {
+    if (typeof item === 'string') {
+      return `<li class="cap-item">${item}</li>`;
+    } else if (item.isParent) {
+      let childrenHtml = '';
+      if (item.children && item.children.length) {
+        childrenHtml = `<ul class="child-list">${item.children.map(child => `<li class="child-item">${child}</li>`).join('')}</ul>`;
+      }
+      return `<li class="cap-item has-children"><span class="parent-title">${item.parentText}</span>${childrenHtml}</li>`;
+    }
+    return '';
+  }
+
+  // Функция для пересчёта высоты контейнера (чтобы колонки заполнялись красиво)
+  function recalcContainerHeight(container) {
+    if (window.innerWidth <= 780) {
+      container.style.height = 'auto';
+      return;
+    }
+    // Получаем все группы
+    const groups = Array.from(container.children);
+    if (groups.length === 0) return;
+    
+    // Определяем желаемую высоту: максимальная суммарная высота первых N групп в зависимости от количества колонок
+    // Проще: берём высоту контейнера, которая позволит разместить все группы в 3-4 колонки.
+    // Но для column wrap важно задать высоту так, чтобы колонки заполнялись равномерно.
+    // Рассчитаем количество колонок на основе средней ширины группы + gap.
+    const groupWidth = groups[0]?.offsetWidth || 320;
+    const gap = parseFloat(getComputedStyle(container).gap) || 24;
+    const containerWidth = container.clientWidth;
+    let columns = Math.max(1, Math.floor((containerWidth + gap) / (groupWidth + gap)));
+    columns = Math.min(columns, 4); // максимум 4 колонки для читаемости
+    
+    // Находим суммарную высоту групп в каждой колонке и берём максимальную
+    const columnHeights = new Array(columns).fill(0);
+    groups.forEach((group, idx) => {
+      const colIdx = idx % columns;
+      const groupHeight = group.offsetHeight;
+      columnHeights[colIdx] += groupHeight + gap;
+    });
+    const neededHeight = Math.max(...columnHeights) + 20;
+    container.style.height = Math.max(neededHeight, 600) + 'px';
+  }
+
+  // Создание группы с collapsible функционалом
+  function buildGroup(groupData) {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'capability-group';
+    
+    const groupContent = document.createElement('div');
+    groupContent.className = 'group-content';
+    
+    const header = document.createElement('div');
+    header.className = 'category-head';
+    
+    const titleSpan = document.createElement('div');
+    titleSpan.className = 'title-text';
+    titleSpan.innerHTML = `${groupData.title}<span class="category-sub">${groupData.sub || ''}</span>`;
+    
+    const toggleSpan = document.createElement('span');
+    toggleSpan.className = 'toggle-icon';
+    toggleSpan.textContent = '−';
+    header.appendChild(titleSpan);
+    header.appendChild(toggleSpan);
+    
+    const listContainer = document.createElement('div');
+    listContainer.className = 'capabilities-list-container';
+    
+    const listUl = document.createElement('ul');
+    listUl.className = 'capabilities-list';
+    groupData.items.forEach(item => {
+      listUl.insertAdjacentHTML('beforeend', renderListItem(item));
+    });
+    listContainer.appendChild(listUl);
+    groupContent.appendChild(header);
+    groupContent.appendChild(listContainer);
+    groupDiv.appendChild(groupContent);
+    
+    let isExpanded = true;
+    let animating = false;
+    
+    function toggleVisibility() {
+      if (animating) return;
+      animating = true;
+      isExpanded = !isExpanded;
+      
+      const containerFlex = document.querySelector('.flex-categories');
+      if (isExpanded) {
+        listContainer.style.maxHeight = listContainer.scrollHeight + 'px';
+        listContainer.style.opacity = '1';
+        toggleSpan.textContent = '−';
+        const onOpenEnd = () => {
+          listContainer.style.maxHeight = 'none';
+          listContainer.removeEventListener('transitionend', onOpenEnd);
+          animating = false;
+          // после изменения высоты группы пересчитываем высоту контейнера, чтобы колонки перестроились
+          setTimeout(() => recalcContainerHeight(containerFlex), 50);
+        };
+        listContainer.addEventListener('transitionend', onOpenEnd);
+        // fallback
+        setTimeout(() => {
+          if (animating) {
+            listContainer.style.maxHeight = 'none';
+            animating = false;
+            recalcContainerHeight(containerFlex);
+          }
+        }, 350);
+      } else {
+        const currentHeight = listContainer.scrollHeight;
+        listContainer.style.maxHeight = currentHeight + 'px';
+        void listContainer.offsetHeight;
+        listContainer.style.maxHeight = '0px';
+        listContainer.style.opacity = '0';
+        toggleSpan.textContent = '+';
+        const onCloseEnd = () => {
+          animating = false;
+          recalcContainerHeight(containerFlex);
+          listContainer.removeEventListener('transitionend', onCloseEnd);
+        };
+        listContainer.addEventListener('transitionend', onCloseEnd);
+        setTimeout(() => {
+          if (animating) {
+            animating = false;
+            recalcContainerHeight(containerFlex);
+          }
+        }, 350);
+      }
+    }
+    
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleVisibility();
+    });
+    
+    // Инициализация открытого состояния
+    setTimeout(() => {
+      listContainer.style.maxHeight = listContainer.scrollHeight + 'px';
+      listContainer.style.opacity = '1';
+      listContainer.style.overflow = 'hidden';
+      setTimeout(() => {
+        if (isExpanded) listContainer.style.maxHeight = 'none';
+      }, 200);
+    }, 10);
+    
+    return groupDiv;
+  }
+  
+  // Рендер всех групп и управление высотой контейнера
+  const container = document.getElementById('capabilitiesContainer');
+  categoriesData.forEach(data => {
+    container.appendChild(buildGroup(data));
+  });
+  
+  // Функция обновления высоты при загрузке и изменении размера окна
+  function updateLayout() {
+    recalcContainerHeight(container);
+  }
+  
+  window.addEventListener('resize', () => {
+    setTimeout(updateLayout, 100);
+  });
+  
+  // Небольшая задержка для корректного расчёта после полного рендера
+  setTimeout(updateLayout, 150);
+  
+  // Наблюдатель за изменениями DOM (на случай, если какие-то анимации повлияют)
+  const observer = new ResizeObserver(() => {
+    updateLayout();
+  });
+  observer.observe(container);
+  document.querySelectorAll('.capability-group').forEach(g => observer.observe(g));
+</script>
+</body>
+</html>
