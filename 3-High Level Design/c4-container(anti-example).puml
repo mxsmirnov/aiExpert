@@ -81,9 +81,6 @@ Rel(team_svc, team_db, "Читает/пишет", "SQL/JDBC")
 Rel(reporting_svc, reporting_db, "Читает", "SQL/Native")
 Rel(adr_worker_agent, agent_db, "Читает/пишет", "SQL/JDBC")
 
-
-
-
 ' Связи с внешними системами и агентом
 Rel(external_system, api_gateway, "Отправляет запросы (UC-001, UC-002, UC-003)", "HTTPS/REST")
 Rel(adr_worker_agent, mcp_source, "Использует MCP-инструменты (UC-005)", "MCP-протокол/HTTPS")
